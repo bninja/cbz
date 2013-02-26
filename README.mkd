@@ -41,7 +41,7 @@ dependencies:
 
     $ pip install cython
 
-build (not that you'll need to install lib to build):
+build (note that you'll need to install lib to build):
 
     $ cd bindings/py
     $ python setup.py clean build_ext --inplace
