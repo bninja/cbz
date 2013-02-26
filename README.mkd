@@ -8,11 +8,11 @@ peer
 you'll need to run a "peer" (really a server) for most of the tests:
 
     $ cd extras
-    $ ./peer.py 7000
+    $ ./peer.py -p 7000
 
 run as many as you like:
 
-    $ ./peer.py 7001
+    $ ./peer.py -p 7001
 
 lib
 ---
