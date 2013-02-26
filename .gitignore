@@ -14,7 +14,6 @@
 /lib/autom4te.cache
 /lib/aclocal.m4
 /lib/compile
-/lib/configure
 /lib/depcomp
 /lib/install-sh
 /lib/missing
@@ -23,4 +22,3 @@
 *.o
 *.pc
 Makefile.in
-Makefile
