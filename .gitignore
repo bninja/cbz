@@ -14,8 +14,6 @@
 /lib/autom4te.cache
 /lib/aclocal.m4
 /lib/compile
-/lib/depcomp
-/lib/missing
 *.Plo
 *.Po
 *.o
