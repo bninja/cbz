@@ -1,0 +1,26 @@
+# misc
+*~
+
+# python
+.pyc
+.pyo
+
+# eclipse
+.project
+.pydevproject
+.cproject
+
+# autotools
+/lib/autom4te.cache
+/lib/aclocal.m4
+/lib/compile
+/lib/configure
+/lib/depcomp
+/lib/install-sh
+/lib/missing
+*.Plo
+*.Po
+*.o
+*.pc
+Makefile.in
+Makefile

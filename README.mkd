@@ -1,0 +1,56 @@
+cbz
+===
+Cozy Buzz.
+
+peer
+---
+
+you'll need to run a "peer" (really a server) for most of the tests:
+
+    $ cd extras
+    $ ./peer.py 7000
+
+run as many as you like:
+
+    $ ./peer.py 7001
+
+lib
+---
+
+build:
+
+    $ cd lib
+    $ ./configure
+    $ make
+
+tests (there are many, you need to run an active peer for most of them):
+
+    $ ./tests/tests cxn-fail :7000 :8000
+    ...
+    $ ./tests/tests ping-pong :7000 :7001 :7002
+    ...
+
+install:
+
+    $ make install
+
+python bingings
+---
+
+dependencies:
+
+    $ pip install cython
+
+build:
+
+    $ cd bindings/py
+    $ python setup.py clean build_ext --inplace
+
+tests (there are many, you need to run an active peer for most of them):
+
+    $ ./tests cxn-fail 7000 8000 -l debug
+    ...
+    $ ./tests/tests ping-pong :7000
+    ...
+    $ ./tests/tests champion :7000 :7001 :7002 -l info
+

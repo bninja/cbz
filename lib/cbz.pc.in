@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: cbz
+Description: Cozy Buzz.
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lcbz
+Cflags: -I${includedir}
