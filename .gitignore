@@ -14,7 +14,12 @@
 /lib/autom4te.cache
 /lib/aclocal.m4
 /lib/compile
+/lib/src/.libs
+/lib/tests/tests
 *.Plo
 *.Po
 *.o
 *.pc
+*.lo
+*.la
+*.log
