@@ -34,7 +34,7 @@ install:
 
     $ make install
 
-python bingings
+python bindings
 ---
 
 dependencies:
