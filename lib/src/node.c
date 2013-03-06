@@ -166,13 +166,16 @@ int cbz_connect(
         }
     }
 
-    // timeouts
     for (i = 0; i < num_cxns; i += 1) {
         if (cxns[i].node->pending) {
             LOG_INFO("connection to %s:%i timed-out after %s sec(s)",
                 cxns[i].address, cxns[i].port, timeout);
             cxns[i].result = CBZ_ERR_TIMEOUT;
             cxns[i].node->pending = false;
+        }
+        if (CBZ_FAILED(cxns[i].result)) {
+        	cbz_disconnect(ctx, cxns[i].node);
+        	cxns[i].node = NULL;
         }
     }
 

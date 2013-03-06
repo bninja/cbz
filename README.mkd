@@ -20,10 +20,11 @@ lib
 build:
 
     $ cd lib
+    $ autoreconf --install
     $ ./configure
     $ make
 
-tests (there are many, you need to run an active peer for most of them):
+tests (note that you need to run peer(s) for most of them):
 
     $ ./tests/tests cxn-fail :7000 :8000
     ...
@@ -41,12 +42,12 @@ dependencies:
 
     $ pip install cython
 
-build (note that you'll need to install lib to build):
+build (note that you'll need to install lib):
 
     $ cd bindings/py
     $ python setup.py clean build_ext --inplace
 
-tests (there are many, you need to run an active peer for most of them):
+tests (note that you need to run peer(s) for most of them):
 
     $ ./tests cxn-fail 7000 8000 -l debug
     ...
@@ -54,3 +55,17 @@ tests (there are many, you need to run an active peer for most of them):
     ...
     $ ./tests/tests champion :7000 :7001 :7002 -l info
 
+java bindings
+---
+
+dependencies:
+
+    $ cd bindings/java
+    $ mvn dependency:copy-dependencies
+
+build (note that you'll need to install lib):
+
+    $ autoreconf --install
+    $ mvn process-classes
+
+tests (note that you need to run peer(s) for most of them).
