@@ -4,26 +4,27 @@
 #ifndef _CBZ_H_INCLUDED_
 #define _CBZ_H_INCLUDED_
 
-#include <stdint.h>
+#include <stddef.h>
+#include <time.h>
 
-#define CBZ_VERSION "0.1.0"
+#define CBZ_VERSION "0.0.0"
 
-#define CBZ_OK			 	0
-#define CBZ_ERR_MEMORY		-1
-#define CBZ_ERR_UNKNOWN		-2
-#define CBZ_ERR_ADDRESS		-3
-#define CBZ_ERR_CONNECT		-4
-#define CBZ_ERR_SEND		-5
-#define CBZ_ERR_RECV		-6
-#define CBZ_ERR_TIMEOUT		-7
-#define CBZ_ERR_SELECT		-8
-#define CBZ_ERR_MAX_MSG		-9
-#define CBZ_ERR_SOCKET		-10
+#define CBZ_OK                 0
+#define CBZ_ERR_MEMORY        -1
+#define CBZ_ERR_UNKNOWN        -2
+#define CBZ_ERR_ADDRESS        -3
+#define CBZ_ERR_CONNECT        -4
+#define CBZ_ERR_SEND        -5
+#define CBZ_ERR_RECV        -6
+#define CBZ_ERR_TIMEOUT        -7
+#define CBZ_ERR_SELECT        -8
+#define CBZ_ERR_MAX_MSG        -9
+#define CBZ_ERR_SOCKET        -10
 
-#define CBZ_SUCCEEDED(result)	(CBZ_OK <= result)
-#define CBZ_FAILED(result) 		(!CBZ_SUCCEEDED(result))
+#define CBZ_SUCCEEDED(result)    (CBZ_OK <= result)
+#define CBZ_FAILED(result)         (!CBZ_SUCCEEDED(result))
 
-#define CBZ_LOG_DBG		10
+#define CBZ_LOG_DBG        10
 #define CBZ_LOG_INFO    20
 #define CBZ_LOG_WARN    30
 #define CBZ_LOG_ERR     40
@@ -37,8 +38,8 @@ typedef void (*cbz_free_t)(void *handle, void *p);
 typedef int (*cbz_log_t)(void *handle, unsigned int level, char *fmt, ... );
 
 typedef struct cbz_ctx_s {
-	void *handle;
-	size_t max_msg_len;
+    void *handle;
+    size_t max_msg_len;
     cbz_malloc_t malloc;
     cbz_calloc_t calloc;
     cbz_realloc_t realloc;
@@ -49,10 +50,10 @@ typedef struct cbz_ctx_s {
 typedef struct cbz_node_s cbz_node_t;
 
 typedef struct cbz_cxn_s {
-	char address[CBZ_MAX_ADDRESS_LEN + 1];
-	int port;
-	int result;
-	cbz_node_t *node;
+    char address[CBZ_MAX_ADDRESS_LEN + 1];
+    int port;
+    int result;
+    cbz_node_t *node;
 } cbz_cxn_t;
 
 typedef struct cbz_ping_s {
@@ -71,9 +72,9 @@ typedef struct cbz_pong_s {
  * Connect to a collection of peers.
  */
 int cbz_connect(
-		cbz_ctx_t *ctx,
-		cbz_cxn_t *cxns, size_t num_cxns,
-		time_t timeout);
+        cbz_ctx_t *ctx,
+        cbz_cxn_t *cxns, size_t num_cxns,
+        time_t timeout);
 
 /*
  * Disconnect from a peer.
@@ -84,18 +85,18 @@ void cbz_disconnect(cbz_ctx_t *ctx, cbz_node_t *node);
  * Send pings to a collection of peers.
  */
 int cbz_ping(
-		cbz_ctx_t *ctx,
-		char *msg, size_t msg_len,
-		cbz_ping_t *pings, size_t num_pings,
-		time_t timeout);
+        cbz_ctx_t *ctx,
+        char *msg, size_t msg_len,
+        cbz_ping_t *pings, size_t num_pings,
+        time_t timeout);
 
 /*
  * Receive pongs from a collection of peers with outstanding pings.
  */
 int cbz_pong(
-		cbz_ctx_t *ctx,
-		cbz_pong_t *pongs, size_t num_pongs,
-		time_t timeout);
+        cbz_ctx_t *ctx,
+        cbz_pong_t *pongs, size_t num_pongs,
+        time_t timeout);
 
 
 /*

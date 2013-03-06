@@ -2,8 +2,8 @@
 *~
 
 # python
-.pyc
-.pyo
+*.pyc
+*.pyo
 
 # eclipse
 .project
@@ -11,15 +11,32 @@
 .cproject
 
 # autotools
-/lib/autom4te.cache
-/lib/aclocal.m4
-/lib/compile
-/lib/src/.libs
-/lib/tests/tests
-*.Plo
-*.Po
+*.la
+*.lo
 *.o
 *.pc
-*.lo
-*.la
-*.log
+.libs
+.deps
+aclocal.m4
+autom4te.cache
+config.guess
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+libtool
+ltmain.sh
+Makefile
+Makefile.in
+missing
+
+
+# lib
+lib/tests/tests
+
+# bindings/java
+bindings/java/bin
+bindings/java/target
+

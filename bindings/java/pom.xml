@@ -1,0 +1,132 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.cbz</groupId>
+  <artifactId>cbz</artifactId>
+  <packaging>jar</packaging>
+  <name>cbz-java</name>
+  <version>0.1</version>
+  <description>cbz java bindings.</description>
+  <url>http://www.example.com</url>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>git@github.com:bninja/cbz.git</url>
+    <connection>scm:git:git@github.com:bninja/cbz.git</connection>
+    <developerConnection>scm:git:git@github.com:bninja/cbz.git</developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <id>dev</id>
+      <name>dev</name>
+      <email>dev@example.com</email>
+      <organization>cbz</organization>
+      <organizationUrl>https://www.example.com</organizationUrl>
+      <timezone>-7</timezone>
+    </developer>
+  </developers>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  <dependencies>
+	<dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.10</version>
+	  <scope>test</scope>
+	 </dependency>
+  </dependencies>
+  <profiles>
+  </profiles>
+  <build>
+		<plugins>
+		
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <target
+                                name="jni"
+                                description="Generate headers and compile the native code">
+                                <echo>Generating JNI headers</echo>
+                                <!-- Does not work with OpenJDK, because Ant javah assumes Sun JVM
+                                <javah
+                                    destdir="${project.basedir}/src/main/c"
+                                    classpath="${project.build.outputDirectory}">
+                                    <class name="com.cbz.Context"/>
+                                    <class name="com.cbz.Node"/>
+                                </javah>
+                                -->
+                                <exec executable="javah" >
+                                    <arg value="-d" />
+                                    <arg value="${project.basedir}/src/main/c" />
+                                    <arg value="-classpath" />
+                                    <arg value="${project.build.outputDirectory}" />
+                                    <arg value="-force" />
+                                    <arg value="com.cbz.Context" />
+                                    <arg value="com.cbz.Node" />
+                                </exec>
+
+                                <exec executable="${project.basedir}/configure">
+                                    <arg value="--libdir" />
+                                    <arg value="${project.basedir}/target/c" />
+                                </exec>
+                                <exec executable="make" ></exec>
+                                <exec executable="make" >
+                                    <arg value="install" />
+                                </exec>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+		    <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <version>2.3.2</version>
+		        <configuration>
+		            <source>1.5</source>
+		            <target>1.5</target>
+		        </configuration>
+		    </plugin>
+		    <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-source-plugin</artifactId>
+		        <version>2.2.1</version>
+		        <executions>
+		            <execution>
+		                <id>attach-sources</id>
+		                <goals>
+		                    <goal>jar</goal>
+		                </goals>
+		            </execution>
+		        </executions>
+		    </plugin>
+		    <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-javadoc-plugin</artifactId>
+		        <version>2.9</version>
+		        <executions>
+		            <execution>
+		                <id>attach-javadocs</id>
+		                <goals>
+		                    <goal>jar</goal>
+		                </goals>
+		            </execution>
+		        </executions>
+		    </plugin>
+		</plugins>
+    </build>
+</project>

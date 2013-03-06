@@ -6,10 +6,10 @@
 #include "cbz.h"
 
 struct cbz_node_s {
-	char address[CBZ_MAX_ADDRESS_LEN];
-	int port;
-	int socket;
-	bool pending;
+    char address[CBZ_MAX_ADDRESS_LEN];
+    int port;
+    int socket;
+    bool pending;
 };
 
 #endif
