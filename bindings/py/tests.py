@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def test_cxn_fail(args):
     ctx = cbz.Context(log=log)
-    
+
     peers = resolve_peers(args.peers)
     results, nodes = zip(*ctx.connect(peers))
     assert([cbz.ERR_CONNECT] * len(results) == list(results))
@@ -21,14 +21,14 @@ def test_cxn_fail(args):
 
 def test_pong_timeout(args):
     ctx = cbz.Context(log=log)
-    
+
     peers = resolve_peers(args.peers)
     results, nodes = zip(*ctx.connect(peers))
     assert([cbz.ERR_CONNECT] * len(results) == list(results))
-    
+
     results = ctx.ping(nodes, 'ping')
     assert([cbz.OK] * len(results) == list(results))
-    
+
     try:
         ctx.pong(args)
     except cbz.Error, ex:
@@ -40,64 +40,64 @@ def test_pong_timeout(args):
 
 def test_pong_max_msg(args):
     ctx = cbz.Context(log=log, max_msg_len=10)
-    
+
     peers = resolve_peers(args.peers)
     results, nodes = zip(*ctx.connect(peers))
     assert([cbz.OK] * len(results) == list(results))
-    
+
     results = ctx.ping(nodes, 'ping')
     assert([cbz.OK] * len(results) == list(results))
-    
+
     results, msgs, nodes = zip(*ctx.pong(nodes))
     assert([cbz.ERR_MAX_MSG] * len(results) == list(results))
 
 
 def test_ping_empty(args):
     ctx = cbz.Context(log=log)
-    
+
     peers = resolve_peers(args.peers)
     results, nodes = zip(*ctx.connect(peers))
     assert([cbz.OK] * len(results) == list(results))
-    
+
     results, nodes = zip(*ctx.ping(nodes, ''))
     assert([cbz.OK] * len(results) == list(results))
-    
+
     results, msgs, nodes = zip(*ctx.pong(nodes))
     assert([cbz.OK] * len(results) == list(results))
 
 
 def test_ping_pong(args):
     ctx = cbz.Context(log=log)
-    
+
     peers = resolve_peers(args.peers)
     results, nodes = zip(*ctx.connect(peers))
     assert([cbz.OK] * len(results) == list(results))
-    
+
     results, nodes = zip(*ctx.ping(nodes, 'ping'))
     assert([cbz.OK] * len(results) == list(results))
-     
+
     results, msgs, nodes = zip(*ctx.pong(nodes))
     for result, msg, node in zip(results, msgs, nodes):
-        print '{0}:{1}'.format(node.address, node.port), result 
+        print '{0}:{1}'.format(node.address, node.port), result
         if result == cbz.OK:
             print msg
     assert([cbz.OK] * len(results) == list(results))
-        
+
 
 def test_champion(args):
     ctx = cbz.Context(log=log)
-    
+
     peers = resolve_peers(args.peers)
     results, nodes = zip(*ctx.connect(peers))
     nodes = filter(None, nodes)
-    
+
     while nodes:
         results = ctx.ping(nodes, 'ping')
         nodes = [node for result, node in results if result == cbz.OK]
-         
+
         results = ctx.pong(nodes)
         for result, msg, node in results:
-            print '{0}:{1}'.format(node.address, node.port), result 
+            print '{0}:{1}'.format(node.address, node.port), result
             if result == cbz.OK:
                 print msg
         nodes = [node for result, msg, node in results if result == cbz.OK]
@@ -141,7 +141,7 @@ def parse_peer(s):
     port = int(m.group('port'))
     return (host, port)
 
-    
+
 def main():
     # args
     arg_parser = ArgumentParser()
@@ -151,14 +151,14 @@ def main():
     args = arg_parser.parse_args()
     args.test = args.test[0]
     args.peers = args.peers[0]
-    
+
     # logging
     logger.setLevel(getattr(logging, args.log_level.upper()))
     handler = logging.StreamHandler(sys.stderr)
     fmt = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
     handler.setFormatter(fmt)
     logger.addHandler(handler)
-    
+
     # test!
     TESTS[args.test](args)
 

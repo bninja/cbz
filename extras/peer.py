@@ -10,15 +10,15 @@ from time import sleep
 
 
 class Handler(SocketServer.BaseRequestHandler):
-    
+
     TERMINAL = '\r\n'
     PONG_ALPHABET = string.ascii_letters + string.digits
-    
+
     def __init__(self, request, client_address, server):
         self.buffer = ''
         SocketServer.BaseRequestHandler.__init__(
             self, request, client_address, server)
-    
+
     def handle(self):
         if not self.server.ping and not self.server.pong:
             return
@@ -29,30 +29,34 @@ class Handler(SocketServer.BaseRequestHandler):
                 self._pong()
 
     def _ping(self):
-        print 'ping from', '{0}:{1}'.format(*self.client_address)
-        
-        while True:
-            if self.server.recv_delay:
-                sleep(self.server.recv_delay)
-            try:
-                data = self.request.recv(self.server.recv_size)
-            except socket.error, e:
-                if e.errno not in (errno.EWOULDBLOCK, errno.EAGAIN):
-                    raise
-                select.select([self.request], [], [], self.server.recv_wait)
-                continue
-            start = min(0, len(self.buffer) - len(self.TERMINAL))
-            self.buffer += data
-            idx = self.buffer.find(self.TERMINAL, start)
-            if idx == -1:
-                continue
+        idx = self.buffer.find(self.TERMINAL, 0)
+        if idx != -1:
             msg = self.buffer[:idx]
-            self.buffer = self.buffer[idx + len(self.TERMINAL):] 
-            print msg
-            break
-                
+            self.buffer = self.buffer[idx + len(self.TERMINAL):]
+        else:
+            while True:
+                if self.server.recv_delay:
+                    sleep(self.server.recv_delay)
+                try:
+                    data = self.request.recv(self.server.recv_size)
+                except socket.error, e:
+                    if e.errno not in (errno.EWOULDBLOCK, errno.EAGAIN):
+                        raise
+                    select.select([self.request], [], [], self.server.recv_wait)
+                    continue
+                start = max(0, len(self.buffer) - len(self.TERMINAL))
+                self.buffer += data
+                idx = self.buffer.find(self.TERMINAL, start)
+                if idx == -1:
+                    continue
+                msg = self.buffer[:idx]
+                self.buffer = self.buffer[idx + len(self.TERMINAL):]
+                break
+        print 'ping from', '{0}:{1}'.format(*self.client_address)
+        print len(msg), msg
 
-    def _pong(self): 
+
+    def _pong(self):
         print 'pong to', '{0}:{1}'.format(*self.client_address)
 
         lines = []
@@ -64,7 +68,7 @@ class Handler(SocketServer.BaseRequestHandler):
             line = ''.join(random.choice(self.PONG_ALPHABET) for _ in range(size))
             lines.append(line)
         msg = '\n'.join(lines) + self.TERMINAL
-        
+
         frag_off = 0
         while frag_off < len(msg):
             if self.server.send_delay:
@@ -81,11 +85,11 @@ class Handler(SocketServer.BaseRequestHandler):
             frag_off += sent
 
 class Server(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-    
+
     daemon_threads = True
-    
+
     allow_reuse_address = True
-    
+
     def __init__(self,
             server_address,
             ping,
@@ -109,7 +113,7 @@ class Server(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
         self.send_delay = send_delay
         self.send_wait = send_wait
         self.send_size = send_size
-        
+
     def get_request(self):
         request = SocketServer.TCPServer.get_request(self)
         request[0].setblocking(0)

@@ -332,6 +332,59 @@ void test_champion(cbz_cxn_t *cxns, size_t num_cxns)
     }
 }
 
+
+void test_pings_pongs(cbz_cxn_t *cxns, size_t num_cxns)
+{
+    size_t i, j, repeat = 5;
+    int res;
+    cbz_ping_t *pings;
+    cbz_pong_t *pongs;
+
+    // connect
+    res = cbz_connect(&ctx, cxns, num_cxns, 0);
+    assert(res == CBZ_OK);
+    for (i = 0; i < num_cxns; i += 1) {
+        assert(cxns[i].result == CBZ_OK);
+        assert(cxns[i].node != NULL);
+    }
+
+    // pings
+    for (j = 0; j < repeat; j += 1) {
+        pings = calloc(num_cxns, sizeof(cbz_ping_t));
+        for (i = 0; i < num_cxns; i += 1) {
+            pings[i].node = cxns[i].node;
+        }
+        res = cbz_ping(&ctx, "ping", sizeof("ping") - 1, pings, num_cxns, 0);
+        assert(res == CBZ_OK);
+        for (i = 0; i < num_cxns; i += 1) {
+            assert(pings[i].result == CBZ_OK);
+        }
+    }
+
+    // pongs
+    for (j = 0; j < repeat; j += 1) {
+        pongs = calloc(num_cxns, sizeof(cbz_pong_t));
+        for (i = 0; i < num_cxns; i += 1) {
+            pongs[i].node = cxns[i].node;
+        }
+        res = cbz_pong(&ctx, pongs, num_cxns, 0);
+        assert(res == CBZ_OK);
+        for (i = 0; i < num_cxns; i += 1) {
+            assert(pongs[i].result == CBZ_OK);
+            printf("pong %s:%i\n", cxns[i].address, cxns[i].port);
+            printf("%.*s", (int)pongs[i].msg_len, pongs[i].msg);
+            printf("\n");
+            cbz_close(&ctx, &pongs[i]);
+        }
+        assert(res == CBZ_OK);
+    }
+
+    // disconnect
+    for (i = 0; i < num_cxns; i += 1) {
+        cbz_disconnect(&ctx, cxns[i].node);
+    }
+}
+
 const char* USAGE = "{command} {[address]:port} ... {[address]:port}";
 
 #define ERR_CMD        -1
@@ -364,6 +417,8 @@ int main(int argc, char** argv)
         test = &test_ping_pong;
     else if (strcmp(arg, "champion") == 0)
         test = &test_champion;
+    else if (strcmp(arg, "pings-pongs") == 0)
+            test = &test_pings_pongs;
     else {
         fprintf(stderr, "invalid command '%s', usage - %s\n", arg, USAGE);
         res = ERR_CMD;

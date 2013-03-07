@@ -9,22 +9,22 @@
 
 #define CBZ_VERSION "0.0.0"
 
-#define CBZ_OK                 0
-#define CBZ_ERR_MEMORY        -1
-#define CBZ_ERR_UNKNOWN        -2
-#define CBZ_ERR_ADDRESS        -3
-#define CBZ_ERR_CONNECT        -4
+#define CBZ_OK              0
+#define CBZ_ERR_MEMORY      -1
+#define CBZ_ERR_UNKNOWN     -2
+#define CBZ_ERR_ADDRESS     -3
+#define CBZ_ERR_CONNECT     -4
 #define CBZ_ERR_SEND        -5
 #define CBZ_ERR_RECV        -6
-#define CBZ_ERR_TIMEOUT        -7
-#define CBZ_ERR_SELECT        -8
-#define CBZ_ERR_MAX_MSG        -9
-#define CBZ_ERR_SOCKET        -10
+#define CBZ_ERR_TIMEOUT     -7
+#define CBZ_ERR_SELECT      -8
+#define CBZ_ERR_MAX_MSG     -9
+#define CBZ_ERR_SOCKET      -10
 
 #define CBZ_SUCCEEDED(result)    (CBZ_OK <= result)
-#define CBZ_FAILED(result)         (!CBZ_SUCCEEDED(result))
+#define CBZ_FAILED(result)       (!CBZ_SUCCEEDED(result))
 
-#define CBZ_LOG_DBG        10
+#define CBZ_LOG_DBG     10
 #define CBZ_LOG_INFO    20
 #define CBZ_LOG_WARN    30
 #define CBZ_LOG_ERR     40

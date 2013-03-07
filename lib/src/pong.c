@@ -14,16 +14,16 @@
 #define MAX_RECV_SIZE 1024
 
 static char TERMINAL[] = {'\r', '\n'};
-static size_t TERMINAL_SIZE = sizeof(TERMINAL);
+static size_t TERMINAL_LEN = sizeof(TERMINAL);
 
-#define DONE(p)        (p.buf_end - p.buf_off >= sizeof(TERMINAL) && memcmp(p.buf_off, TERMINAL, sizeof(TERMINAL)) == 0)
-#define FAILED(p)    CBZ_FAILED(p.result)
-#define PENDING(p)    (p.node != NULL && !FAILED(p) && !DONE(p))
+#define DONE(p)     (p.buf_term != NULL)
+#define PENDING(p)  (p.node != NULL && !CBZ_FAILED(p.result) && !DONE(p))
 
 typedef struct pong_s {
     cbz_node_t *node;
     int result;
     char *buf;
+    char *buf_term;
     char *buf_off;
     char *buf_end;
 } pong_t;
@@ -32,7 +32,7 @@ static int _pong(cbz_ctx_t *ctx, pong_t *pong)
 {
     size_t total, remaining, size;
     ssize_t recvd;
-    void *buf;
+    char *buf;
 
     // grow buf
     remaining = pong->buf_end - pong->buf_off;
@@ -73,10 +73,10 @@ static int _pong(cbz_ctx_t *ctx, pong_t *pong)
 
     // adjust buf
     pong->buf_off += recvd;
-    if (pong->buf - pong->buf_off >= sizeof(TERMINAL) &&
-        memcmp(pong->buf_off - TERMINAL_SIZE, TERMINAL, TERMINAL_SIZE) == 0) {
-        pong->buf_off -= TERMINAL_SIZE;
-    }
+    buf = MAX(pong->buf_off - recvd - TERMINAL_LEN, pong->buf);
+    buf = memmem(TERMINAL, TERMINAL_LEN, buf, pong->buf_off - buf);
+    if (buf != NULL)
+        pong->buf_term = buf;
 
     return recvd;
 }
@@ -93,6 +93,7 @@ int cbz_pong(
     fd_set read_fds;
     int max_fd, res;
     struct timeval select_timeout, *pselect_timeout = NULL;
+    char *buf;
 
     if (timeout != 0) {
         pselect_timeout = &select_timeout;
@@ -106,10 +107,22 @@ int cbz_pong(
         return CBZ_ERR_MEMORY;
     for (i = 0; i < num_pongs; i += 1) {
         ps[i].node = pongs[i].node;
-        ps[i].buf = ps[i].buf_off = MALLOC(BUF_BASE_SIZE);
-        if (ps[i].buf == NULL) {
-            ps[i].result = CBZ_ERR_MEMORY;
-            continue;
+        if (ps[i].node->buf) {
+            ps[i].buf = ps[i].node->buf;
+            ps[i].buf_off = ps[i].node->buf + ps[i].node->buf_len;
+            ps[i].buf_end = ps[i].node->buf + ps[i].node->buf_len;
+            ps[i].node->buf = NULL;
+            ps[i].node->buf_len = 0;
+            buf = memmem(TERMINAL, TERMINAL_LEN, ps[i].buf, ps[i].buf_off - ps[i].buf);
+            if (buf != NULL)
+                ps[i].buf_term = buf;
+        }
+        else {
+            ps[i].buf = ps[i].buf_off = MALLOC(BUF_BASE_SIZE);
+            if (ps[i].buf == NULL) {
+                ps[i].result = CBZ_ERR_MEMORY;
+                continue;
+            }
         }
         ps[i].buf_end = ps[i].buf + BUF_BASE_SIZE;
     }
@@ -172,9 +185,30 @@ int cbz_pong(
     }
 
     for (i = 0; i < num_pongs; i += 1) {
-        pongs[i].result = PENDING(ps[i]) ? CBZ_ERR_TIMEOUT : ps[i].result;
-        pongs[i].msg = ps[i].buf;
-        pongs[i].msg_len = ps[i].buf_off - ps[i].buf;
+        if (DONE(ps[i])) {
+            pongs[i].result = ps[i].result;
+            pongs[i].msg = ps[i].buf;
+            pongs[i].msg_len = ps[i].buf_term - ps[i].buf;
+            pongs[i].node->buf_len = ps[i].buf_off - (ps[i].buf_term + TERMINAL_LEN);
+            if (pongs[i].node->buf_len != 0) {
+                pongs[i].node->buf = MALLOC(pongs[i].node->buf_len);
+                if (pongs[i].node->buf == NULL)
+                    continue;
+                memcpy(pongs[i].node->buf, ps[i].buf_term + TERMINAL_LEN, pongs[i].node->buf_len);
+            }
+        }
+        else if (PENDING(ps[i])) {
+            pongs[i].result = CBZ_ERR_TIMEOUT;
+            pongs[i].msg_len = 0;
+            pongs[i].msg = NULL;
+            FREE(ps[i].buf);
+        }
+        else {
+            pongs[i].result = ps[i].result;
+            pongs[i].msg_len = 0;
+            pongs[i].msg = NULL;
+            FREE(ps[i].buf);
+        }
     }
     FREE(ps);
 

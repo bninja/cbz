@@ -12,6 +12,8 @@
 
 void *mallocz(cbz_ctx_t *ctx, size_t size);
 
+void *memmem(void *needle, size_t needle_len, void *haystack, size_t haystack_len);
+
 #define LOG_DBG(fmt, ...)    if (ctx->log != NULL) ctx->log(ctx->handle, CBZ_LOG_DBG, fmt, __VA_ARGS__)
 #define LOG_INFO(fmt, ...)    if (ctx->log != NULL) ctx->log(ctx->handle, CBZ_LOG_INFO, fmt, __VA_ARGS__)
 #define LOG_WARN(fmt, ...)    if (ctx->log != NULL) ctx->log(ctx->handle, CBZ_LOG_WARN, fmt, __VA_ARGS__)

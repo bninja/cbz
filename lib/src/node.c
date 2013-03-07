@@ -189,5 +189,10 @@ void cbz_disconnect(cbz_ctx_t *ctx, cbz_node_t *node)
         node->socket = -1;
         LOG_INFO("disconnected from %s:%i", node->address, node->port);
     }
+    if (node->buf != NULL) {
+        FREE(node->buf);
+        node->buf = NULL;
+        LOG_INFO("discarded buffer from %s:%i", node->address, node->port);
+    }
     FREE(node);
 }
